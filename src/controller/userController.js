@@ -45,12 +45,64 @@ const getUserById = async (req, res) => {
   };
 
 // Create a new user
-  const createUser = async (req, res) => {
-    try {
-      const timestamp = new Date().getTime(); // Get current timestamp
-      const id = timestamp.toString(); // Extract the first 8 digits
+//   const createUser = async (req, res) => {
+//     try {
+//       const timestamp = new Date().getTime(); // Get current timestamp
+//       const id = timestamp.toString(); // Extract the first 8 digits
   
-      // Hash the password before storing it
+//       // Hash the password before storing it
+//       const hashedPassword = await bcrypt.hash(req.body.password, 10);
+  
+//       const currentTime = new Date();
+//       const options = { timeZone: 'Asia/Jakarta', hour12: false };
+  
+//       const userData = {
+//         id: id,
+//         username: req.body.username,
+//         email: req.body.email,
+//         password: hashedPassword,
+//         create: currentTime.toLocaleString('en-ID', options),
+//         update: currentTime.toLocaleString('en-ID', options),
+//       };
+  
+//       const { error } = await supabase
+//         .from('user')
+//         .insert([userData]);
+  
+//       if (error) {
+//         res.status(500).send(error);
+//       } else {
+//         res.status(201).send({ status: "Success", message: "User created!" });
+//       }
+//     } catch (error) {
+//       console.error('Error creating user:', error.message);
+//       res.status(500).send(error.message);
+//     }
+//   };
+
+const createUser = async (req, res) => {
+    try {
+      const { email } = req.body;
+  
+      // Check if the email is already registered
+      const { data: existingUser, error: emailError } = await supabase
+        .from('user')
+        .select('id')
+        .eq('email', email);
+  
+      if (emailError) {
+        console.error('Error checking email:', emailError.message);
+        return res.status(500).send({ status: 'Error', message: 'Internal server error' });
+      }
+  
+      if (existingUser && existingUser.length > 0) {
+        return res.status(400).send({ status: 'Error', message: 'Email already registered' });
+      }
+  
+      // Continue with user registration if email is not registered
+      const timestamp = new Date().getTime();
+      const id = timestamp.toString();
+  
       const hashedPassword = await bcrypt.hash(req.body.password, 10);
   
       const currentTime = new Date();
@@ -59,7 +111,7 @@ const getUserById = async (req, res) => {
       const userData = {
         id: id,
         username: req.body.username,
-        email: req.body.email,
+        email: email,
         password: hashedPassword,
         create: currentTime.toLocaleString('en-ID', options),
         update: currentTime.toLocaleString('en-ID', options),
@@ -76,9 +128,10 @@ const getUserById = async (req, res) => {
       }
     } catch (error) {
       console.error('Error creating user:', error.message);
-      res.status(500).send(error.message);
+      res.status(500).send({ status: 'Error', message: error.message });
     }
   };
+  
   
   
 
