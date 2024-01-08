@@ -44,41 +44,6 @@ const getUserById = async (req, res) => {
     }
   };
 
-// Create a new user
-//   const createUser = async (req, res) => {
-//     try {
-//       const timestamp = new Date().getTime(); // Get current timestamp
-//       const id = timestamp.toString(); // Extract the first 8 digits
-  
-//       // Hash the password before storing it
-//       const hashedPassword = await bcrypt.hash(req.body.password, 10);
-  
-//       const currentTime = new Date();
-//       const options = { timeZone: 'Asia/Jakarta', hour12: false };
-  
-//       const userData = {
-//         id: id,
-//         username: req.body.username,
-//         email: req.body.email,
-//         password: hashedPassword,
-//         create: currentTime.toLocaleString('en-ID', options),
-//         update: currentTime.toLocaleString('en-ID', options),
-//       };
-  
-//       const { error } = await supabase
-//         .from('user')
-//         .insert([userData]);
-  
-//       if (error) {
-//         res.status(500).send(error);
-//       } else {
-//         res.status(201).send({ status: "Success", message: "User created!" });
-//       }
-//     } catch (error) {
-//       console.error('Error creating user:', error.message);
-//       res.status(500).send(error.message);
-//     }
-//   };
 
 const createUser = async (req, res) => {
     try {
@@ -131,31 +96,7 @@ const createUser = async (req, res) => {
       res.status(500).send({ status: 'Error', message: error.message });
     }
   };
-  
-  
-  
 
-// // Update a user by ID
-// const updateUser = async (req, res) => {
-//   try {
-//     const { error } = await supabase
-//       .from('user')
-//       .update({
-//         username: req.body.username,
-//         email: req.body.email,
-//         // Update other user properties as needed
-//       })
-//       .eq('id', req.params.id);
-//     if (error) {
-//       res.status(500).send(error);
-//     } else {
-//       res.status(200).send("User updated!");
-//     }
-//   } catch (error) {
-//     console.error('Error updating user:', error.message);
-//     res.status(500).send(error.message);
-//   }
-// };
 
 // Delete a user by ID
 const deleteUser = async (req, res) => {
@@ -175,10 +116,39 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const getCoinAndDiamond = async (req, res) => {
+  try {
+    const userId = req.params.userId; // Assuming you are passing userId as a parameter
+
+    // Fetch data based on userId
+    const { data, error } = await supabase
+      .from('user')
+      .select("*")
+      .eq('id', userId)
+      .single(); // Assuming you expect only one record for a specific userId
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    console.log(data);
+    if (!data) {
+      res.status(404).json({ message: 'Data not found for the specified userId' });
+      return;
+    }
+
+    // Data found, send it as a JSON response
+    res.status(200).json({status : "Success" , data : { coin : data.coin , data : data.diamond} });
+  } catch (error) {
+    console.error('Error getting coin and diamond:', error.message);
+    res.status(500).send(error.message);
+  }
+}
+
 module.exports = {
   getAllUsers,
   getUserById,
   createUser,
-//   updateUser,
   deleteUser,
+  getCoinAndDiamond
 };

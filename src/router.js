@@ -10,7 +10,7 @@ router.get('/users', userController.getAllUsers);
 router.get('/users/:id', userController.getUserById);
 router.post('/users', userController.createUser);
 // router.put('/users/:id', userController.updateUser);
-router.delete('/users/:id', userController.deleteUser);
+// router.delete('/users/:id', userController.deleteUser);
 
 // food table
 router.get('/foods', foodController.getAllFoods);
@@ -21,5 +21,8 @@ router.delete('/foods/:id', foodController.deleteFood);
 // api login
 router.post('/login', loginController.loginUser);
 router.post('/sign-up', signupController.createUser);
+
+// get coin and diamond
+router.get("/coin-diamond/:userId", userController.getCoinAndDiamond)
 
 module.exports = router;
