@@ -138,7 +138,7 @@ const getCoinAndDiamond = async (req, res) => {
     }
 
     // Data found, send it as a JSON response
-    res.status(200).json({status : "Success" , data : { coin : data.coin , data : data.diamond} });
+    res.status(200).json({status : "Success" , data : { coin : data.coin , diamond : data.diamond} });
   } catch (error) {
     console.error('Error getting coin and diamond:', error.message);
     res.status(500).send(error.message);
