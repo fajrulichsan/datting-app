@@ -28,12 +28,13 @@ const getUserById = async (req, res) => {
         .from('user')
         .select('*')
         .eq('id', req.params.id);
+        
       if (error) {
         console.error('Error fetching user:', error.message);
         res.status(500).send(error.message);
       } else {
         if (data && data.length > 0) {
-          res.status(200).send(data);
+          res.status(200).send(data[0]);
         } else {
           res.status(404).send({status : 'Error' , message : "User not found"});
         }
@@ -116,34 +117,58 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// const getCoinAndDiamond = async (req, res) => {
+//   try {
+//     const userId = req.params.userId; // Assuming you are passing userId as a parameter
+
+//     // Fetch data based on userId
+//     const { data, error } = await supabase
+//       .from('user')
+//       .select("*")
+//       .eq('id', userId);
+//       // .single(); // Assuming you expect only one record for a specific userId
+
+//     if (error) {
+//       throw new Error(error.message);
+//     }
+
+//     console.log(data);
+//     if (!data) {
+//       res.status(404).json({ message: 'Data not found for the specified userId' });
+//       return;
+//     }
+
+//     // Data found, send it as a JSON response
+//     res.status(200).json({status : "Success" , data : { coin : data.coin , diamond : data.diamond} });
+//   } catch (error) {
+//     console.error('Error getting coin and diamond:', error.message);
+//     res.status(500).send(error.message);
+//   }
+// }
+
 const getCoinAndDiamond = async (req, res) => {
   try {
-    const userId = req.params.userId; // Assuming you are passing userId as a parameter
+      const { data: userData, error: userError } = await supabase
+            .from('user')
+            .select('*')
+            .eq('id', req.params.userId);
 
-    // Fetch data based on userId
-    const { data, error } = await supabase
-      .from('user')
-      .select("*")
-      .eq('id', userId)
-      .single(); // Assuming you expect only one record for a specific userId
-
-    if (error) {
-      throw new Error(error.message);
+      console.log(userData);
+    if (userError) {
+      console.error('Error fetching user:', userError.message);
+      res.status(500).send(userError.message);
+    } else {
+      if (userData && userData.length > 0) {
+        res.status(200).send({ status: "Success",  data : {coin : userData[0].coin , diamond : userData[0].diamond}});
+      } else {
+        res.status(404).send({status : 'Error' , message : "User not found"});
+      }
     }
-
-    console.log(data);
-    if (!data) {
-      res.status(404).json({ message: 'Data not found for the specified userId' });
-      return;
-    }
-
-    // Data found, send it as a JSON response
-    res.status(200).json({status : "Success" , data : { coin : data.coin , diamond : data.diamond} });
   } catch (error) {
-    console.error('Error getting coin and diamond:', error.message);
+    console.error('Error fetching user:', error.message);
     res.status(500).send(error.message);
   }
-}
+};
 
 module.exports = {
   getAllUsers,
