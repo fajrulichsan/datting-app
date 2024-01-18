@@ -27,8 +27,7 @@ const getUserById = async (req, res) => {
       const { data, error } = await supabase
         .from('user')
         .select('*')
-        .eq('id', req.params.id);
-        
+        .eq('id', req.params.userId);
       if (error) {
         console.error('Error fetching user:', error.message);
         res.status(500).send(error.message);
